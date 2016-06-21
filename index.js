@@ -9,6 +9,7 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
 var SSDP = require("./ssdp");
 var EventEmitter = require("events").EventEmitter;
 var http = require("http");
+var getPort = require("get-port");
 
 function getXML(address, cb) {
     http.get(address, function (res) {
@@ -31,17 +32,23 @@ function search(ssdp, cb) {
     });
 }
 
-function getFriendlyName(xml) {
-    return xml.match(/<friendlyName>(.+?)<\/friendlyName>/)[1];
+function getXmlArg(name, xml) {
+    return xml.match(new RegExp('<'+name+'>(.+?)<\/'+name+'>', ''))[1]
 }
 
 var Browser = (function (EventEmitter) {
-    function Browser() {
-        _classCallCheck(this, Browser);
+    function Browser(cb) {
+        var that = this;
 
-        this._chromecastSSDP = new SSDP(3333);
-        this._upnpSSDP = new SSDP(3334);
-        this._devices = [];
+        getPort().then(function(port) {
+
+            that._upnpSSDP = new SSDP(port);
+            that._devices = [];
+
+            _classCallCheck(that, Browser);
+            cb();
+
+        });
     }
 
     _inherits(Browser, EventEmitter);
@@ -53,11 +60,15 @@ var Browser = (function (EventEmitter) {
 
                 search(this._upnpSSDP, function (headers, rinfo, xml) {
 
-                    var name = getFriendlyName(xml);
+                    var name = getXmlArg('friendlyName', xml);
                     if (!name) return;
 
                     var device = new EventEmitter();
                     device.name = name;
+                    device.modelName = getXmlArg('modelName', xml);
+                    device.modelDescription = getXmlArg('modelDescription', xml);
+                    device.modelNumber = getXmlArg('modelNumber', xml);
+                    device.serialNumber = getXmlArg('serialNumber', xml);
                     device.address = rinfo.address;
                     device.xml = headers.LOCATION;
                     device.headers = headers;

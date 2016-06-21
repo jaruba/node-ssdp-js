@@ -15,6 +15,9 @@
   ],
   "author": "",
   "license": "MIT",
+  "dependencies": {
+    "get-port": "^2.1.0"
+  },
   "bugs": {
     "url": "https://github.com/Ivshti/node-ssdp-js/issues"
   },

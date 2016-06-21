@@ -97,7 +97,8 @@ var SSDP = (function (EventEmitter) {
                 this._socket = null;
                 if (!this._interval) {
                     return;
-                }clearInterval(this._interval);
+                }
+                clearInterval(this._interval);
             },
             writable: true,
             configurable: true
