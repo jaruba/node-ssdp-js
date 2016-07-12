@@ -33,7 +33,8 @@ function search(ssdp, cb) {
 }
 
 function getXmlArg(name, xml) {
-    return xml.match(new RegExp('<'+name+'>(.+?)<\/'+name+'>', ''))[1]
+	var matched = xml.match(new RegExp('<'+name+'>(.+?)<\/'+name+'>', ''));
+    return matched && matched[1] ? matched[1] : '';
 }
 
 var Browser = (function (EventEmitter) {
